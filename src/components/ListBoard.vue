@@ -1,12 +1,18 @@
 <template>
     <div>
-    <!---
-    <div class="showList" v-for="item in inOutList">
+        <div>
+            <h3>Attention!!!</h3>
+            <p>未完成です。入力フォームへの正しくない入力などを弾く機能は実装していません。優しく使ってあげてください</p>
+            <ul>
+                実装済み機能
+                <li>初期、データベースをサーバーから取得、クライアントで表示</li>
+                <li>データベースへの登録(自動でリストはリロードされません)</li>
+                <li>リスト表示のリロード</li>
+                <li>削除機能はボタンだけ実装で中身はありません</li>
+            </ul>
+        </div>
+        <el-button type="primary" round @click="reloadList"> RELOAD</el-button>
 
-    </div>
-    <span v-for="item in inOutList" v-bind:key="item.id">
-        <p>{{ item.id }} {{ item.date }} {{ item.category }} {{ item.item }} {{ item.price }} {{ item.discription }}</p>
-    </span> --->
         <template>
             <el-table
                     :data="inOutList"
@@ -31,6 +37,10 @@
                     prop="discription"
                     label="Discription"
                     width="180"></el-table-column>
+                <el-table-column label="Delete" prop="id" width="80" >
+
+                    <el-button type="danger" icon="el-icon-delete" circle @click.native.prevent="deleteList(id)"></el-button>
+                </el-table-column>
             </el-table>
         </template>
     <AddList />
@@ -48,6 +58,7 @@
                 inOutList: [],
                 loading: true,
                 errored: false,
+                id: ''
             }
         },
         components:{
@@ -58,8 +69,6 @@
                 .then(
                     response=>{
                         this.inOutList = response.data
-                        // this.data.inOutList = JSON.parse(this.getList)
-                        // console.log(this.getList)
                     }
                 ).catch(
                     error =>{
@@ -67,6 +76,31 @@
                         this.errored = true
                     }
             )
+
+        },
+        methods: {
+            reloadList() {
+                axios.get('http://localhost:4567/get_all')
+                    .then(
+                        response=>{
+                            this.inOutList = response.data
+                        }
+                    ).catch(
+                    error =>{
+                        alert(error)
+                        this.errored = true
+                    }
+                )
+            },
+            deleteList: function(id) {
+                alert(id)
+                axios.delete('http://localhost:4567/delete?id=' + id)
+                    .then(
+                        response => {
+                            alert('This delete is '+ response.data)
+                        }
+                    )
+            }
         }
     }
 </script>
